@@ -1,0 +1,68 @@
+import time
+#the time module provies many ways of representing time in code, such as objects,numbers,and strings
+import tkinter as tk
+# tkinter is a library that can be used to constuct basic graphical user interface(GUI) application
+import threading
+#threading is a module that used to run multiple threads(tasks,function cells) at the time
+class CountdownTimer:
+    def __init__(self, master, seconds):
+        self.master = master
+        self.seconds = seconds
+        self.running = False
+        self.paused = False
+        self.thread = None
+
+        self.label = tk.Label(master, text="00:00", font=("Helvetica", 48))
+        self.label.pack()
+        #master represents the parent window
+        #Label is used to specify the container box where we can place the text or images
+
+        self.start_button = tk.Button(master, text="Start", command=self.start)
+        #Button is used to add buttons in a python application
+        self.start_button.pack()
+
+        self.stop_button = tk.Button(master, text="Stop", command=self.stop)
+        self.stop_button.pack()
+
+        self.pause_button = tk.Button(master, text="Pause", command=self.pause)
+        self.pause_button.pack()
+
+        self.reset_button = tk.Button(master, text="Reset", command=self.reset)
+        self.reset_button.pack()
+
+    def start(self):
+        self.running = True
+        self.thread = threading.Thread(target=self._countdown)
+        self.thread.start()
+
+    def stop(self):
+        self.running = False
+        self.paused = False
+
+    def pause(self):
+        self.paused = True
+
+    def reset(self):
+        self.stop()
+        self.seconds = 30
+        self.label.config(text="00:00")
+        # here when we click on the reset button it will again start from 30 to backward
+
+    def _countdown(self):
+        while self.running:
+            if not self.paused:
+                minutes, seconds = divmod(self.seconds, 60)
+                time_string = "{:02d}:{:02d}".format(minutes, seconds)
+                self.label.config(text=time_string)
+                self.seconds -= 1
+                time.sleep(1)
+            else:
+                time.sleep(0.1)
+
+root = tk.Tk()
+#it  helps to display the root window and manages all the other components of the tkinter application
+root.title("countdown timer")
+#title used to add a title to the page
+timer = CountdownTimer(root,30)
+#here want to start with 30 to backward
+root.mainloop()
